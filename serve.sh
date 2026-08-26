@@ -6,21 +6,35 @@ set -euo pipefail
 MODEL_CACHE="${MODEL_CACHE:-/data/hf-cache}"
 MODEL_REV="7872f01b1d1fe23eabc4c98b48bffcef5a386062"
 MODEL_PATH="/root/.cache/huggingface/models--deepseek-ai--DeepSeek-V4-Flash-0731/snapshots/${MODEL_REV}"
-IMAGE="${IMAGE:-vllm/vllm-openai:v0.25.0}"
 IMAGE_DIGEST="sha256:e1c1ff1af9a15921bfa11d1d95047258c1797392cdbfa296e7639da446b23f97"
+# Pinned by digest, not tag: the v0.25.0 tag has been observed to drift.
+IMAGE="${IMAGE:-vllm/vllm-openai@${IMAGE_DIGEST}}"
 CONTAINER="${CONTAINER:-v4flash-serve-dpm}"
 
 # VLLM_API_KEY is read from the environment and never written to disk by this script.
 # Supply it from your own secret store, e.g. export VLLM_API_KEY="$(your-secret-tool get ...)"
 : "${VLLM_API_KEY:?set VLLM_API_KEY from your secret store}"
 
-test -d "${MODEL_CACHE}" || { echo "model cache ${MODEL_CACHE} not found" >&2; exit 1; }
+# Check the actual snapshot directory, not just the cache root. If you downloaded
+# with a default HF_HOME instead of --cache-dir, the model lands under a `hub/`
+# subdirectory and this path will not resolve -- fail here rather than several
+# minutes into engine startup.
+HOST_MODEL_PATH="${MODEL_CACHE}/models--deepseek-ai--DeepSeek-V4-Flash-0731/snapshots/${MODEL_REV}"
+if [ ! -d "${HOST_MODEL_PATH}" ]; then
+  echo "model snapshot not found: ${HOST_MODEL_PATH}" >&2
+  if [ -d "${MODEL_CACHE}/hub/models--deepseek-ai--DeepSeek-V4-Flash-0731" ]; then
+    echo "  Found a 'hub/' subdirectory. Either re-download with" >&2
+    echo "  --cache-dir ${MODEL_CACHE}, or set MODEL_CACHE=${MODEL_CACHE}/hub" >&2
+  fi
+  exit 1
+fi
 
-# The v0.25.0 tag has been observed to drift. Warn if the local tag no longer
-# matches the digest this recipe was validated against.
-if ! docker images --digests vllm/vllm-openai | grep -q "${IMAGE_DIGEST%%:*}\|${IMAGE_DIGEST#sha256:}"; then
-  echo "WARNING: validated digest ${IMAGE_DIGEST} not found locally." >&2
-  echo "         Pull explicitly: docker pull vllm/vllm-openai@${IMAGE_DIGEST}" >&2
+# Confirm the local image really is the validated one.
+if ! docker image inspect "${IMAGE}" --format '{{join .RepoDigests "\n"}}' 2>/dev/null \
+     | grep -q "@${IMAGE_DIGEST}$"; then
+  echo "ERROR: ${IMAGE} does not resolve to the validated digest." >&2
+  echo "       Pull explicitly: docker pull vllm/vllm-openai@${IMAGE_DIGEST}" >&2
+  exit 1
 fi
 
 docker rm -f "${CONTAINER}" 2>/dev/null || true

@@ -28,7 +28,9 @@ done
 # Guards against wrong image, wrong weights, or wrong flags, which move KV by
 # orders of magnitude. Sub-0.1% deltas are CUDA-graph profiling variance.
 echo "== Gate 2: KV invariant (expect 8x ${EXPECTED_KV}) =="
-mapfile -t kv < <(docker logs "${CONTAINER}" 2>&1 \
+# Portable array fill (mapfile is bash 4+; macOS ships bash 3.2).
+kv=()
+while IFS= read -r _line; do kv+=("$_line"); done < <(docker logs "${CONTAINER}" 2>&1 \
   | grep -oE 'GPU KV cache size: [0-9,]+ tokens' \
   | grep -oE '[0-9,]+' | tr -d ',')
 if [ "${#kv[@]}" -ne 8 ]; then

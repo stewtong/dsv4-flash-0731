@@ -3,7 +3,9 @@
 
 A reproducible vLLM serving recipe for `deepseek-ai/DeepSeek-V4-Flash-0731` on a single 8x NVIDIA B200 node, tuned for multi-user interactive coding traffic.
 
-The configuration here runs **data-parallel attention (DP8) with expert parallelism (EP8) and DSpark speculative decoding at k=5**, in vLLM's per-rank external-load-balancer mode. Public report [vllm-project/vllm#51454](https://github.com/vllm-project/vllm/issues/51454) recorded that DSpark and DP8 together failed to launch in a single attempt, with no compatibility claim made either way. They do run together; the argv below is the working combination, and the reason it works is `--data-parallel-multi-port-external-lb` with `--data-parallel-size-local 8`.
+The configuration here runs **data-parallel attention (DP8) with expert parallelism (EP8) and DSpark speculative decoding at k=5**, in vLLM's per-rank external-load-balancer mode. Public report [vllm-project/vllm#51454](https://github.com/vllm-project/vllm/issues/51454) recorded that DSpark and DP8 together failed to launch in a single attempt, with no compatibility claim made either way. They do run together, and the argv below is a working combination — it has served as a standing endpoint since 2026-08-21.
+
+What is not established is *why* the earlier attempt failed. That was a single try with no isolated cause, and this configuration differs from it in more than one way, notably `--data-parallel-multi-port-external-lb` with `--data-parallel-size-local 8`. Treat the argv as a known-good recipe, not as a diagnosis.
 
 **Not an official Nebius statement.** Independent benchmarking on Nebius AI Cloud hardware, published as an individual contributor.
 
@@ -22,7 +24,7 @@ The configuration here runs **data-parallel attention (DP8) with expert parallel
 | Model revision | `7872f01b1d1fe23eabc4c98b48bffcef5a386062` |
 | Model on disk | 155.4 GiB, 48 safetensors shards |
 | Draft model | none — DSpark ships inside the base checkpoint |
-| Serving image | `vllm/vllm-openai:v0.25.0` |
+| Serving image | `vllm/vllm-openai:v0.25.0`, pinned by digest (the tag has been observed to drift) |
 | Image digest (amd64) | `sha256:e1c1ff1af9a15921bfa11d1d95047258c1797392cdbfa296e7639da446b23f97` |
 | vLLM version | 0.25.0, V1 engine, build `dd10e03f95f94edbea1975c67ace3a35ec9a8a40` |
 | GPUs | 8x NVIDIA B200 SXM6, SM100, 183,359 MiB each |
@@ -49,6 +51,8 @@ hf download deepseek-ai/DeepSeek-V4-Flash-0731 \
   --cache-dir "$MODEL_DIR"
 ```
 
+`--cache-dir` matters. With it, the snapshot lands at `$MODEL_DIR/models--deepseek-ai--DeepSeek-V4-Flash-0731/snapshots/<rev>`, which is the path the launch command expects. Downloading with a default `HF_HOME` instead puts it one level deeper, under `hub/`, and the container path will not resolve. `serve.sh` checks for this and tells you which case you are in.
+
 ### 2. Pull the image by digest
 
 The `v0.25.0` tag has been observed to drift. Pin by digest and verify before serving.
@@ -56,12 +60,15 @@ The `v0.25.0` tag has been observed to drift. Pin by digest and verify before se
 ```bash
 IMAGE=vllm/vllm-openai@sha256:e1c1ff1af9a15921bfa11d1d95047258c1797392cdbfa296e7639da446b23f97
 docker pull "$IMAGE"
-docker images --digests vllm/vllm-openai
+docker image inspect "$IMAGE" --format '{{join .RepoDigests "\n"}}'
 ```
 
 ### 3. Launch
 
+`VLLM_API_KEY` is read from the environment and is never written to disk by these scripts. Supply it from your own secret store.
+
 ```bash
+export VLLM_API_KEY="$(your-secret-tool get vllm-api-key)"
 ./serve.sh
 ```
 
@@ -74,7 +81,7 @@ docker run -d --name v4flash-serve-dpm --restart unless-stopped \
   -e VLLM_API_KEY="$VLLM_API_KEY" \
   -v /data/hf-cache:/root/.cache/huggingface \
   -p 127.0.0.1:8100-8107:8100-8107 -p 127.0.0.1:9256:9256 \
-  vllm/vllm-openai:v0.25.0 \
+  vllm/vllm-openai@sha256:e1c1ff1af9a15921bfa11d1d95047258c1797392cdbfa296e7639da446b23f97 \
   /root/.cache/huggingface/models--deepseek-ai--DeepSeek-V4-Flash-0731/snapshots/7872f01b1d1fe23eabc4c98b48bffcef5a386062 \
   --served-model-name deepseek-v4-flash-0731 --trust-remote-code \
   --kv-cache-dtype fp8 --block-size 256 \
@@ -91,6 +98,8 @@ docker run -d --name v4flash-serve-dpm --restart unless-stopped \
 ```
 
 ### 4. Verify before sending traffic
+
+Run this on the serve host, with `VLLM_API_KEY` exported, once the container has been up for a few minutes.
 
 ```bash
 ./verify.sh
@@ -225,7 +234,7 @@ Stated plainly so nobody reads the tables above as describing this deployment:
 
 | File | Purpose |
 | --- | --- |
-| `serve.sh` | The launch command, parameterized by environment |
+| `serve.sh` | The launch command, parameterized by environment. Pins the image by digest, and fails before launch if the model snapshot path or image digest is wrong. |
 | `verify.sh` | Post-launch gates: per-rank health, KV invariant, a live completion |
 
 ## References
