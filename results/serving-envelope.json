@@ -1,0 +1,86 @@
+{
+  "cells": {
+    "k5-mnbt8192:128k": {
+      "leg": "cellK5-mnbt8192",
+      "shape_tok": 131072,
+      "n_sessions": 3,
+      "n_turns_total": 18,
+      "n_warm_turns": 15,
+      "pct_ok": 100.0,
+      "ttfvt_s_p50": 0.3903,
+      "warm_stall_turns_s": [
+        2.323,
+        14.886
+      ],
+      "tps_decode_p50": 221.08,
+      "tps_turn_p50": 202.84,
+      "wall_s_p50": 5.028,
+      "cold_turn1_ttfvt_s_p50": 4.0855,
+      "output_tokens_turn_median": 1024.0,
+      "n_errors": 0
+    },
+    "k5-mnbt8192:256k": {
+      "leg": "cellK5-mnbt8192",
+      "shape_tok": 262144,
+      "n_sessions": 3,
+      "n_turns_total": 18,
+      "n_warm_turns": 15,
+      "pct_ok": 100.0,
+      "ttfvt_s_p50": 0.7297,
+      "warm_stall_turns_s": [
+        12.577,
+        14.444
+      ],
+      "tps_decode_p50": 240.79,
+      "tps_turn_p50": 197.68,
+      "wall_s_p50": 4.793,
+      "cold_turn1_ttfvt_s_p50": 9.0449,
+      "output_tokens_turn_median": 1024.0,
+      "n_errors": 0
+    },
+    "specoff:128k": {
+      "leg": "specoff",
+      "shape_tok": 131072,
+      "n_sessions": 3,
+      "n_turns_total": 18,
+      "n_warm_turns": 15,
+      "pct_ok": 100.0,
+      "ttfvt_s_p50": 0.391,
+      "warm_stall_turns_s": [],
+      "tps_decode_p50": 99.56,
+      "tps_turn_p50": 92.29,
+      "wall_s_p50": 4.382,
+      "cold_turn1_ttfvt_s_p50": 3.9994,
+      "output_tokens_turn_median": 405.0,
+      "n_errors": 0
+    },
+    "specoff:256k": {
+      "leg": "specoff",
+      "shape_tok": 262144,
+      "n_sessions": 3,
+      "n_turns_total": 18,
+      "n_warm_turns": 15,
+      "pct_ok": 100.0,
+      "ttfvt_s_p50": 0.6918,
+      "warm_stall_turns_s": [],
+      "tps_decode_p50": 96.62,
+      "tps_turn_p50": 87.81,
+      "wall_s_p50": 11.267,
+      "cold_turn1_ttfvt_s_p50": 8.8819,
+      "output_tokens_turn_median": 1024.0,
+      "n_errors": 0
+    }
+  },
+  "normalized_wall": {
+    "128k": {
+      "specoff_ms": 8426.4,
+      "k5_ms": 4008.9,
+      "reduction_pct": 52.4
+    },
+    "256k": {
+      "specoff_ms": 8971.7,
+      "k5_ms": 4052.1,
+      "reduction_pct": 54.8
+    }
+  }
+}
