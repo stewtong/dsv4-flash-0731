@@ -30,3 +30,7 @@ reconstructed.
 The Claude Code version is an observed point. Environment-variable names and
 gateway behavior are reported for that build and are not a promise for later
 versions.
+
+See the [August 30 deployment verification](verification-2026-08-30.md) for a
+later current-state runtime capture. It does not alter this August 21 benchmark
+environment record.

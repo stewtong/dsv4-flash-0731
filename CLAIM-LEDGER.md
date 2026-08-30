@@ -33,6 +33,11 @@ Evidence classes:
 | Single-KV-head design favors independent DP caches over TP KV replication | First-party design evidence | [vllm-project/vllm#51454](https://github.com/vllm-project/vllm/issues/51454); the issue is not performance evidence for this profile |
 | Claude Code 2.1.229 was the observed client build | Recorded | Retained prefix-affinity plan; later client versions are outside the claim |
 | A `thinking` request was accepted but no thinking block was emitted | Recorded | Retained `/v1/messages` observation; not re-tested through the public reference |
+| August 30 fixed-k5 deployment passed all rank, aggregate, balancer, proxy, and public health boundaries | Recorded | `results/verification-2026-08-30.md`; raw operational artifacts are not published |
+| Fresh August 30 startup recorded 17,076,237 KV tokens on each of eight ranks | Recorded | `results/verification-2026-08-30.md`; boot logs are retained but not published |
+| August 30 public-gateway suite passed 7 of 7 and the Anthropic success/error matrix returned the documented statuses | Recorded | `results/verification-2026-08-30.md`; synthetic inputs, with no accuracy claim |
+| Current deployment used NVIDIA 580.173.02, CUDA 13.0, PyTorch 2.11.0+cu130, NCCL 2.28.9, and vLLM 0.25.0 | Recorded | `results/verification-2026-08-30.md`; these versions postdate the performance run |
+| Live nginx errors were HTML; isolated sidecar tests returned the documented 502 and truncated-stream behavior | Recorded | `results/verification-2026-08-30.md`; live gateway and isolated-component boundaries are separate |
 
 ## Deliberately excluded claims
 
@@ -40,7 +45,9 @@ Evidence classes:
   with a linear-interpolation p95 of the raw warm aggregate.
 - The private media-normalization component is not published. The public
   reference is text-only and makes no media-transformation claim.
-- Exact Anthropic-compatible error envelopes, mid-stream recovery, non-streaming
-  Messages, and beta-query behavior are not claimed.
+- No Anthropic-compatible JSON parity is claimed for nginx-generated errors.
+- Timeout and mid-stream failure were not injected through the standing
+  endpoint. Their documented behavior comes from isolated tests of source that
+  was byte-identical to the live sidecar.
 - No claim is made that the full measured environment has been recreated from
   the digest-pinned public launcher.

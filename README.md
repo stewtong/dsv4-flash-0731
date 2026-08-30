@@ -54,6 +54,11 @@ Reconcile a materially different value before comparing results.
 - The reference gateway accepts text-only payloads. It does not include the
   private deployment's media-normalization component.
 
+The [August 30 deployment verification](results/verification-2026-08-30.md)
+records a later fixed-k5 restart, current runtime versions, the live Anthropic
+Messages matrix, and bounded failure-path characterization. It does not add or
+change any performance measurement.
+
 ## DSpark result
 
 Against the same DP8 profile with speculation off, k=5 reduced the normalized
@@ -248,8 +253,10 @@ env \
 ```
 
 The public reference supports text-only streaming Messages and token counting.
-It does not certify non-streaming behavior, beta-query handling, Anthropic error
-envelope parity, timeout behavior, or mid-stream disconnect recovery. A
+The [August 30 deployment verification](results/verification-2026-08-30.md)
+records non-streaming Messages, version and beta headers, and exact live error
+classes through the private deployment. Those checks do not certify the
+sanitized nginx references or live timeout and mid-stream behavior. A
 `thinking` request was accepted in the retained source run but did not emit a
 thinking block; output was text-only. Later client or engine versions may
 differ.
@@ -262,8 +269,9 @@ differ.
   hops. The reference nginx files remove their caps.
 - HTTP 429 is the reference ingress policy of eight in-flight connections per
   authenticated user, not an engine or GPU limit.
-- Exact nginx error bodies for 413, 429, connection failure, timeout, and
-  mid-stream failure are not characterized as Anthropic-compatible envelopes.
+- Live 401, 404, 413, and 429 responses were nginx-generated HTML, not
+  Anthropic-compatible JSON envelopes. The August 30 record separates these
+  live results from isolated sidecar failure tests.
 - TLS terminates at the ingress, which can read request and response content.
   The reference logging configuration is metadata-only, but operators remain
   responsible for access controls and retention.
@@ -287,6 +295,7 @@ results/
   raw/
   serving-envelope.json
   environment.md
+  verification-2026-08-30.md
   SHA256SUMS
 ```
 
