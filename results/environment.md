@@ -4,9 +4,9 @@
 
 All campaigns used one dedicated 8x B200 SXM node with approximately 160 vCPUs and 1,792 GB of host memory. The model was `deepseek-ai/DeepSeek-V4-Flash-0731` at revision `7872f01b1d1fe23eabc4c98b48bffcef5a386062`.
 
-## Standing profile and matched comparison
+## Reference deployment and matched comparison
 
-The September 3 matched comparison and standing recipe share these coordinates:
+The September 3 matched comparison and reference deployment share these settings:
 
 | Field | Value |
 | --- | --- |
@@ -23,7 +23,7 @@ The September 3 matched comparison and standing recipe share these coordinates:
 | Batched-token budget | 8,192 |
 | Maximum sequences | 256 |
 | GPU memory utilization | 0.85 |
-| Standing speculation | DSpark k=5 greedy |
+| Speculative decoding | DSpark k=5 greedy |
 | Rank endpoints | Eight loopback API servers on ports 8100 through 8107 |
 | Aggregate controller | Loopback port 9256 |
 
@@ -39,7 +39,7 @@ The topology campaign varied attention parallelism among TP8, TP4 with DP2, TP2 
 
 ## August 21 historical DSpark campaign
 
-The original DSpark width work used the same model revision and vLLM 0.25.0. Its off and k=5 comparison did not hold GPU memory utilization constant, so the older 52.4% and 54.8% normalized-wall figures are historical rather than the standing control.
+The original DSpark width work used the same model revision and vLLM 0.25.0. Its off and k=5 comparison did not hold GPU memory utilization constant, so the older 52.4% and 54.8% normalized-wall figures are historical rather than the reference comparison.
 
 The width search varied speculative width and batched-token budget. The selected final k=5 profile used maximum batched tokens 8,192, maximum sequences 256, GPU memory utilization 0.85, and 17,076,237 KV tokens per rank.
 

@@ -16,7 +16,7 @@ Time is measured by a client running on the serving node. Percentiles use linear
 | End-to-end output rate | `output_tokens / wall`. |
 | Normalized 800-token wall | `ttfvt + 800 / decode_rate`, in seconds. |
 
-Normalized wall is calculated for every request before aggregation because the two arms can produce different answer lengths at temperature 0. Raw wall time remains in the evidence; normalized wall supplies the equal-answer-length comparison.
+Normalized wall time is calculated for every request before aggregation because the two arms can produce different answer lengths at temperature 0. Raw wall time remains in the evidence; normalized wall time provides the equal-answer-length comparison.
 
 Decode rate is a per-request decode-window rate. Aggregate node throughput requires a concurrent node-level measurement.
 
@@ -58,11 +58,11 @@ The verifier requires complete six-turn sessions, zero recorded errors, and one 
 - the August 19 cold topology search across 11 context and concurrency cells;
 - the 8,192 versus 16,384 batched-token comparison;
 - the August 21 DSpark width search;
-- the August 29 TP4 and EP4 challenger.
+- the August 29 TP4 and EP4 comparison.
 
 These are summary-only records. Their raw artifacts are not included, so the individual request-level values are not publicly re-derivable.
 
-The earlier 52.4% and 54.8% normalized-wall reductions came from August 21 records that used different GPU memory utilization settings across the compared profiles. They were also calculated by inserting separately aggregated p50 TTFT and p50 decode rate into the normalization formula. They remain historical results and are superseded as the standing DSpark comparison by the matched per-request calculation.
+The earlier 52.4% and 54.8% normalized-wall reductions came from August 21 records that used different GPU memory utilization settings across the compared profiles. They were also calculated by inserting separately aggregated p50 TTFVT and p50 decode rate into the normalization formula. They remain historical results and are superseded as the reference DSpark comparison by the matched per-request calculation.
 
 ## Request fixture
 
@@ -102,7 +102,7 @@ Writing output requires an explicit output option. The verifier returns nonzero 
 
 ## Environment and gateway provenance
 
-The digest-pinned launcher encodes the standing profile and validates a local model-revision marker. The matched manifest records the image ID used in both measured arms. [`results/environment.md`](../results/environment.md) separates the campaign environments and later runtime verification.
+The digest-pinned launcher encodes the reference deployment and validates a local model-revision marker. The matched manifest records the image ID used in both measured arms. [`results/environment.md`](../results/environment.md) separates the campaign environments and later runtime verification.
 
 The public nginx files are sanitized references. The ingress authenticates requests and provides a trusted fallback affinity key. The balancer selects a rank, then strips rank and session headers before proxying. The private deployment included a separate media-normalization component that is not published or required for the text-only reference.
 

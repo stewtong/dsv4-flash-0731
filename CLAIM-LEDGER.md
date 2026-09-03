@@ -4,15 +4,15 @@
 
 Evidence classes are defined in [`reproduce/METHOD.md`](reproduce/METHOD.md). Published raw claims re-derive from selected records. Published configuration claims are inspectable in this tree. Published summary claims retain campaign-level values without public request-level records. Recorded claims describe private operational evidence. First-party design claims support architecture rationale rather than measured performance.
 
-## Standing profile and matched DSpark result
+## Reference deployment and matched DSpark result
 
 | Claim | Class | Source and boundary |
 | --- | --- | --- |
-| Standing profile is DP8 attention, EP8 experts, DSpark k=5 greedy, maximum batched tokens 8,192, maximum sequences 256, and GPU memory utilization 0.85 | Published configuration | `reproduce/run-replicas.sh` |
+| Reference deployment uses DP8 attention, EP8 experts, DSpark k=5 greedy, maximum batched tokens 8,192, maximum sequences 256, and GPU memory utilization 0.85 | Published configuration | `reproduce/run-replicas.sh` |
 | k=5 cut pooled warm normalized 800-token wall p50 by 55.12% at 128K and 52.24% at 256K | Published raw | `results/dspark-matched/raw/specoff.json`, `k5.json`, and `reproduce/derive-results.py`; 15 warm observations per arm and context |
 | Normalized p50 changed from 8.7055 to 3.9072 seconds at 128K and from 8.5306 to 4.0742 seconds at 256K | Published raw | `results/dspark-matched/summary.json`; calculated per request as `ttfvt + 800 / decode_rate` before aggregation |
 | Decode p50 increased 134.59% at 128K and 134.40% at 256K | Published raw | Matched records and derived summary; per-request decode-window rate, not node throughput |
-| TTFT p50 changed by -1.45% at 128K and +5.28% at 256K | Published raw | Matched records and derived summary |
+| TTFVT p50 changed by -1.45% at 128K and +5.28% at 256K | Published raw | Matched records and derived summary |
 | All six per-session normalized-wall mean comparisons favored k=5 | Published raw | `session_normalized_800_wall_mean_deltas_pct` in the matched summary |
 | All 72 requests returned HTTP 200 with zero errors | Published raw | 36 records per arm; verifier rejects any failed or incomplete record |
 | Two speculation-off 128K warm turns stalled at 12.6058 and 10.1781 seconds; no k=5 warm turn exceeded three seconds | Published raw | Matched raw records and `stalls` in the derived summary |
@@ -25,7 +25,7 @@ Evidence classes are defined in [`reproduce/METHOD.md`](reproduce/METHOD.md). Pu
 
 | Claim | Class | Source and boundary |
 | --- | --- | --- |
-| Direct serial late-turn median TTFT ranged from 0.467 to 0.519 seconds at 128K-class and 0.972 to 1.037 seconds at 256K-class | Published raw | Selected direct-rank session summaries under `results/prefix-affinity/raw/` |
+| Direct serial late-turn median TTFVT ranged from 0.467 to 0.519 seconds at 128K-class and 0.972 to 1.037 seconds at 256K-class | Published raw | Selected direct-rank session summaries under `results/prefix-affinity/raw/` |
 | Four-session concurrent late-turn ranges were 0.934 to 1.189 seconds and 2.162 to 2.793 seconds | Published raw | Selected direct-rank concurrent summaries and derived prefix summary |
 | Gateway serial late-turn ranges were 0.493 to 0.570 seconds and 1.005 to 1.085 seconds | Published raw | `gateway-sessions.json` and derived prefix summary |
 | Every turn of all six gateway sessions stayed on one rank | Published raw | Gateway session records; verifier requires six turns on one serving rank |
@@ -43,10 +43,10 @@ Evidence classes are defined in [`reproduce/METHOD.md`](reproduce/METHOD.md). Pu
 | Cold topology campaign covered 11 cells and 276 requests per topology with zero failures | Published summary | `results/benchmark-summary.json`; request-level artifacts are not included |
 | No topology won every cold cell; DP8 led most short and medium cells, while narrower TP variants led selected stressed or boundary cells | Published summary | Cold-topology p50 and p95 table in the benchmark summary |
 | Raising maximum batched tokens from 8,192 to 16,384 reduced KV capacity from 20,971,965 to 14,138,549, a 32.6% loss, with mixed latency changes | Published summary | Batched-token campaign in the benchmark summary |
-| k=5 was selected over k=7 because k=7's incremental serial gain narrowed at 256K and its concurrent long-context posture regressed | Published summary | DSpark-width campaign and selection reason in the benchmark summary |
+| k=5 was selected over k=7 because k=7's incremental serial gain narrowed at 256K and its concurrent long-context result was worse | Published summary | DSpark-width campaign and selection reason in the benchmark summary |
 | Final k=5 at maximum batched tokens 8,192 recovered 5.8% KV capacity versus the k=5 width-search cell with less than 5% serial effect | Published summary | DSpark-width selected profile and selection reason |
 | MTP failed to reach readiness because the checkpoint lacked `mtp_block.main_norm.weight` | Published summary | DSpark-width campaign; no MTP performance claim |
-| TP4 with EP4 improved 1M decode time per token by 15.3% but regressed wall time by 3.8%, showed sticky slow warm turns, and failed the forced concurrent boundary | Published summary | TP4 challenger in the benchmark summary; mixed 12-session arm was skipped |
+| TP4 with EP4 improved 1M decode time per token by 15.3% but regressed wall time by 3.8%, showed persistently slow warm turns, and failed the forced concurrent test | Published summary | TP4 comparison in the benchmark summary; mixed 12-session arm was skipped |
 
 ## Runtime and compatibility record
 

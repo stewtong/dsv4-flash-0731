@@ -4,7 +4,7 @@
 
 This repository publishes a text-only serving recipe for DeepSeek-V4-Flash-0731 on one dedicated 8x B200 node. The validated topology is 1-way tensor parallelism, 8-way data-parallel attention, and 8-way expert parallelism (TP1, DP8, EP8). It uses vLLM's multi-port external load-balancing mode, FP8 KV cache, an FP4 indexer cache, and DSpark speculative decoding with five draft tokens and greedy draft sampling.
 
-The matched benchmark found that DSpark k=5 reduced pooled warm median (p50) normalized 800-token end-to-end (E2E) latency by **55.1% at 128K** and **52.2% at 256K** versus speculative decoding disabled. All six session-level mean comparisons favored k=5. The result covers serial requests with session affinity. Aggregate throughput and model quality remain unmeasured.
+The matched benchmark found that DSpark k=5 reduced pooled warm median (p50) normalized 800-token wall time by **55.1% at 128K** and **52.2% at 256K** versus speculative decoding disabled. All six session-level mean comparisons favored k=5. The result covers serial requests with session affinity. Aggregate throughput and model quality remain unmeasured.
 
 This is an individual engineering contribution, not an official statement from any vendor.
 
@@ -84,28 +84,28 @@ The matched run held image, model revision, TP1 with DP8 and EP8 topology, reque
 
 Each configuration has three six-turn sessions at each context. Turn 1 is cold. The warm aggregate pools turns 2 through 6, producing 15 warm observations per configuration and context. Turns within a session reuse the same cache and are correlated, so the pooled values are descriptive rather than independent session-level estimates.
 
-| Context | Speculative decoding disabled, normalized 800-token E2E p50 | k=5 normalized 800-token E2E p50 | Delta | Speculative decoding disabled, decode rate p50 | k=5 decode rate p50 |
+| Context | Speculative decoding disabled, normalized 800-token wall p50 | k=5 normalized 800-token wall p50 | Delta | Speculative decoding disabled, decode rate p50 | k=5 decode rate p50 |
 | --- | ---: | ---: | ---: | ---: | ---: |
 | 128K | 8.71 s | 3.91 s | **-55.1%** | 97.16 tok/s | 227.93 tok/s |
 | 256K | 8.53 s | 4.07 s | **-52.2%** | 100.87 tok/s | 236.43 tok/s |
 
-Normalized E2E latency is calculated per request, then aggregated:
+Normalized 800-token wall time is calculated per request, then aggregated:
 
 ```text
 ttfvt_seconds + 800 / decode_tokens_per_second
 ```
 
-The configurations produced different output lengths at temperature 0. Normalized E2E latency supplies the equal-output-length comparison.
+The configurations produced different output lengths at temperature 0. Normalized wall time provides the equal-output-length comparison.
 
-Median (p50) time to first visible token changed from 0.4160 to 0.4100 seconds at 128K and from 0.6485 to 0.6827 seconds at 256K. This measurement stops at the first visible text delta, which can differ from standard time to first token (TTFT) for reasoning models. Two warm control turns in the first two 128K sessions took 12.6058 and 10.1781 seconds to produce visible text. No k=5 warm turn exceeded three seconds. All 72 requests returned HTTP 200 with zero recorded errors.
+Median (p50) time to first visible token (TTFVT) changed from 0.4160 to 0.4100 seconds at 128K and from 0.6485 to 0.6827 seconds at 256K. This measurement stops at the first visible text delta, which can differ from standard time to first token (TTFT) for reasoning models. Two warm control turns in the first two 128K sessions took 12.6058 and 10.1781 seconds to produce visible text. No k=5 warm turn exceeded three seconds. All 72 requests returned HTTP 200 with zero recorded errors.
 
-The earlier 52.4% and 54.8% figures came from an August 21 run that combined different GPU memory utilization settings and aggregated percentile components before normalization. They remain historical context. The matched run supplies the current comparison.
+The earlier 52.4% and 54.8% figures came from an August 21 run that combined different GPU memory utilization settings and aggregated percentile components before normalization. They remain historical context. The matched run provides the current comparison.
 
 ## Prefix locality
 
 Each vLLM DP rank has an independent KV cache. A later turn routed to another rank must prefill the shared prefix again. The consistent-hash gateway kept every turn of all six measured sessions on one DP rank.
 
-| Path | 128K-class late-turn median TTFT | 256K-class late-turn median TTFT |
+| Path | 128K-class late-turn median TTFVT | 256K-class late-turn median TTFVT |
 | --- | ---: | ---: |
 | Direct rank pin, serial | 0.467 to 0.519 s | 0.972 to 1.037 s |
 | Direct rank pin, four concurrent sessions | 0.934 to 1.189 s | 2.162 to 2.793 s |
@@ -172,7 +172,7 @@ env \
 - Live nginx errors used HTML. Anthropic-compatible JSON error envelopes were unverified.
 - The ingress can read request and response content. Its access log excludes bodies and credentials, but remote addresses and user labels still require an appropriate retention policy.
 
-The [August 30 deployment verification](results/verification-2026-08-30.md) records runtime versions, the Anthropic Messages matrix, and bounded failure-path tests. It adds no performance measurement. Do not send protected material to a deployment whose data-handling policy you have not verified.
+The [August 30 deployment verification](results/verification-2026-08-30.md) records runtime versions, the Anthropic Messages matrix, and limited failure-path tests. It adds no performance measurement. Do not send protected material to a deployment whose data-handling policy you have not verified.
 
 ## Measured limits
 
