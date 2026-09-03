@@ -16,8 +16,7 @@ raw operational artifacts are not published in this repository.
 - Fresh startup logs contained eight exact
   `GPU KV cache size: 17,076,237 tokens` records.
 - The seven-prompt functional suite passed 7 of 7 through the public TLS path.
-  Its recorded verdict remains `Pass eligible (pending kernel-dispatch
-  evidence)`. This is a functional gate, not an accuracy result.
+  This was a synthetic functional check, not an accuracy result.
 
 | Runtime field | Current deployment value |
 | --- | --- |
@@ -66,6 +65,7 @@ Timeout and mid-stream failure were not injected into the standing endpoint.
 These three results characterize the byte-identical sidecar component, not the
 complete live gateway under fault injection.
 
-No new performance benchmark was run on August 30. The published 52.4% and
-54.8% normalized-wall reductions continue to derive from the August 21 raw
-request records.
+No new performance benchmark was run on August 30. The old 52.4% and 54.8%
+normalized-wall reductions derive from the August 21 records and used different
+GPU memory utilization settings across arms. The standing performance claim now
+comes from the separately published September 3 matched comparison.

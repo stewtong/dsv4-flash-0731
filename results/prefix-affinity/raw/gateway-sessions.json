@@ -1,0 +1,122 @@
+{
+  "schema_version": "dsv4flash-prefix-affinity-gateway/v1",
+  "topology": "DP8+EP8",
+  "routing": "consistent-hash gateway session pin",
+  "turns_per_session": 6,
+  "rows": [
+    {
+      "context": "128K-class",
+      "session_index": 0,
+      "prompt_tokens": 222099,
+      "t1_ttft_s": 19.007,
+      "late_median_ttft_s": 0.57,
+      "warm_delta_pct": -97.0,
+      "ttfvt_s_by_turn": [
+        19.007,
+        0.589,
+        0.544,
+        0.57,
+        0.558,
+        0.595
+      ],
+      "serving_rank": 4,
+      "turns_on_serving_rank": 6,
+      "all_turns_same_rank": true
+    },
+    {
+      "context": "128K-class",
+      "session_index": 1,
+      "prompt_tokens": 222099,
+      "t1_ttft_s": 7.284,
+      "late_median_ttft_s": 0.493,
+      "warm_delta_pct": -93.24,
+      "ttfvt_s_by_turn": [
+        7.284,
+        0.57,
+        0.514,
+        0.493,
+        0.489,
+        0.467
+      ],
+      "serving_rank": 7,
+      "turns_on_serving_rank": 6,
+      "all_turns_same_rank": true
+    },
+    {
+      "context": "128K-class",
+      "session_index": 2,
+      "prompt_tokens": 222099,
+      "t1_ttft_s": 7.237,
+      "late_median_ttft_s": 0.505,
+      "warm_delta_pct": -93.02,
+      "ttfvt_s_by_turn": [
+        7.237,
+        0.526,
+        0.502,
+        0.505,
+        0.505,
+        0.508
+      ],
+      "serving_rank": 6,
+      "turns_on_serving_rank": 6,
+      "all_turns_same_rank": true
+    },
+    {
+      "context": "256K-class",
+      "session_index": 0,
+      "prompt_tokens": 446049,
+      "t1_ttft_s": 17.645,
+      "late_median_ttft_s": 1.005,
+      "warm_delta_pct": -94.31,
+      "ttfvt_s_by_turn": [
+        17.645,
+        1.161,
+        1.045,
+        1.005,
+        0.956,
+        0.978
+      ],
+      "serving_rank": 7,
+      "turns_on_serving_rank": 6,
+      "all_turns_same_rank": true
+    },
+    {
+      "context": "256K-class",
+      "session_index": 1,
+      "prompt_tokens": 446049,
+      "t1_ttft_s": 17.972,
+      "late_median_ttft_s": 1.085,
+      "warm_delta_pct": -93.96,
+      "ttfvt_s_by_turn": [
+        17.972,
+        1.123,
+        1.085,
+        1.07,
+        1.071,
+        1.131
+      ],
+      "serving_rank": 6,
+      "turns_on_serving_rank": 6,
+      "all_turns_same_rank": true
+    },
+    {
+      "context": "256K-class",
+      "session_index": 2,
+      "prompt_tokens": 446049,
+      "t1_ttft_s": 17.516,
+      "late_median_ttft_s": 1.012,
+      "warm_delta_pct": -94.22,
+      "ttfvt_s_by_turn": [
+        17.516,
+        1.03,
+        1.004,
+        1.002,
+        1.016,
+        1.012
+      ],
+      "serving_rank": 5,
+      "turns_on_serving_rank": 6,
+      "all_turns_same_rank": true
+    }
+  ]
+}

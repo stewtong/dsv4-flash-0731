@@ -1,14 +1,12 @@
-<!-- register: public-github-repo | reader: an ml infra engineer reproducing the result | consumed: read as reference when reproducing, then rare -->
+<!-- register: public-github-repo | reader: an ml infra engineer reproducing or auditing the result | consumed: reference during setup and result comparison -->
 
-# Methodology and provenance
+# Method and provenance
 
-This file defines the published performance metrics, aggregation rules,
-request shape, environment evidence, and known gaps.
+This repository contains two recomputable evidence bundles, one matched DSpark comparison and one prefix-affinity validation. It also includes a machine-readable summary of earlier topology, token-budget, speculative-width, and TP4 campaigns. Campaigns with different controls are reported separately.
 
-## Metrics
+## Metric definitions
 
-All published headline statistics are p50 values. Percentiles use linear
-interpolation. Time is measured at the client running on the serving node.
+Time is measured by a client running on the serving node. Percentiles use linear interpolation.
 
 | Metric | Definition |
 | --- | --- |
@@ -16,57 +14,83 @@ interpolation. Time is measured at the client running on the serving node.
 | Turn wall (`wall`) | Seconds from dispatch to the end of the SSE response. |
 | Decode rate | `output_tokens / (wall - ttfvt)`, using server-reported output tokens. |
 | End-to-end output rate | `output_tokens / wall`. |
-| Normalized wall | `1000 * ttfvt + 800 * (1000 / decode_rate)`, in milliseconds. |
+| Normalized 800-token wall | `ttfvt + 800 / decode_rate`, in seconds. |
 
-The speculation-on and speculation-off arms produced different output lengths
-at temperature 0. Normalized wall compares an equal 800-token answer using each
-arm's p50 first-visible-token time and p50 decode rate. It does not estimate
-aggregate node throughput.
+Normalized wall is calculated for every request before aggregation because the two arms can produce different answer lengths at temperature 0. Raw wall time remains in the evidence; normalized wall supplies the equal-answer-length comparison.
 
-## Cell structure and warm-turn aggregation
+Decode rate is a per-request decode-window rate. Aggregate node throughput requires a concurrent node-level measurement.
 
-Each cell contains three sessions of six sequential turns. Turn 1 is the cold
-reference. The warm aggregate pools turns 2 through 6 across all three sessions,
-giving 15 warm observations per cell. Session identity controls cache placement,
-so observations within one session are clustered and are not treated as
-independent session-level estimates.
+## Matched DSpark campaign
 
-The public bundle contains four cells and 72 requests total:
+The September 3 campaign compared speculation off with DSpark k=5 greedy. Both arms used:
 
-- speculation off at 128K and 256K
-- DSpark k=5 with `--max-num-batched-tokens 8192` at 128K and 256K
+- one dedicated 8x B200 node;
+- vLLM 0.25.0 from the same image ID;
+- model revision `7872f01b1d1fe23eabc4c98b48bffcef5a386062`;
+- DP8 attention with EP8 experts and external load balancing;
+- FP8 KV cache with 256-token blocks and the FP4 indexer cache;
+- `deep_gemm_mega_moe`;
+- maximum batched tokens 8,192, maximum sequences 256, and GPU memory utilization 0.85;
+- serial Messages API requests, temperature 0, maximum output 1,024 tokens, and stable session affinity.
 
-All 72 published records report HTTP 200. The warm aggregates contain 60
-requests total. `derive-results.py` validates the exact three-by-six structure,
-rejects any failed request, and fails on missing or duplicate turns.
+The intended arm difference was speculative configuration. The resulting KV capacity was 17,837,368 tokens per rank with speculation off and 17,076,237 with k=5. The speculation-off value is physically consistent with the shared 0.85 memory setting after removing the draft head. It is not the 20,571,235 value associated with the earlier 0.95 memory setting.
 
-A discarded prewarm request per context shape runs before a measurement series.
-It prevents first-use kernel initialization from being attributed to one arm.
-The public harness provides this behavior through `--prewarm`.
+Each arm and context contains three sessions of six sequential turns. Turn 1 is the cold reference. The warm aggregate pools turns 2 through 6 across all three sessions, giving 15 observations per arm and context. The full bundle contains 72 requests. Session identity controls cache placement, so observations within a session are clustered. Pooled medians and means are descriptive rather than six independent estimates.
 
-## Request shape
+Input-token counts are paired by context, session index, and turn. The verifier requires exact equality across arms. It also requires 36 successful records per arm, the complete session and turn grid, finite positive timings, matching manifest controls, no speculative counter movement for the off arm, and five-position acceptance evidence for k=5.
 
-Traffic is a deterministic synthetic ASCII code-context fixture sent to
-`/v1/messages` with streaming SSE and a stable session header. The nominal
-labels are 131,072 and 262,144 input tokens. The bundled source records report
-132,598 and 264,801 observed input tokens for their respective fixtures.
+Two speculation-off warm turns at 128K exceeded three seconds to first visible text. Their timings and positions are retained in the derived summary. No k=5 warm turn exceeded that threshold.
 
-The current public harness calibrates each generated prefix against
-`/v1/messages/count_tokens` until it is within the configured tolerance. It
-does not estimate input tokens from characters or truncate the count request.
-Each stream must report exact input and output usage. Any calibration, prewarm,
-HTTP, parsing, or usage failure causes a nonzero exit.
+Evidence lives under `results/dspark-matched/`. The selected public records exclude prompts, generated text, session identifiers, private host details, and restart timestamps.
 
-## Derivation
+## Prefix-affinity campaign
 
-Verify the bundled result without writing a file:
+The prefix-affinity campaign used DP8 with EP8, speculation off, GPU memory utilization 0.95, maximum batched tokens 8,192, and 20,571,235 KV tokens per rank. Its separate controls make it routing evidence for the matched DSpark result.
+
+Every session contains six turns. Turn 1 is cold. Each reported late-turn value is the median of turns 2 through 6 for that session. The direct-rank bundle contains serial and four-session concurrent measurements on ranks 0 and 1. The gateway bundle contains three sessions at each of two context classes and records whether every turn remained on the same rank.
+
+The verifier requires complete six-turn sessions, zero recorded errors, and one serving rank for all six turns of every gateway session. Evidence lives under `results/prefix-affinity/`.
+
+## Earlier campaigns
+
+`results/benchmark-summary.json` preserves selected values and boundaries from four retained campaigns:
+
+- the August 19 cold topology search across 11 context and concurrency cells;
+- the 8,192 versus 16,384 batched-token comparison;
+- the August 21 DSpark width search;
+- the August 29 TP4 and EP4 challenger.
+
+These are summary-only records. Their raw artifacts are not included, so the individual request-level values are not publicly re-derivable.
+
+The earlier 52.4% and 54.8% normalized-wall reductions came from August 21 records that used different GPU memory utilization settings across the compared profiles. They were also calculated by inserting separately aggregated p50 TTFT and p50 decode rate into the normalization formula. They remain historical results and are superseded as the standing DSpark comparison by the matched per-request calculation.
+
+## Request fixture
+
+Traffic uses a deterministic synthetic ASCII code-context fixture sent to `/v1/messages` with streaming SSE and a stable session header. Nominal context labels are campaign shorthand rather than exact tokenizer counts.
+
+The public benchmark harness calibrates every generated prefix through `/v1/messages/count_tokens` until it falls within the configured tolerance. It starts timing before sending the HTTP request and requires exact input and output usage from the SSE stream. Calibration, prewarm, HTTP, parsing, or usage failure returns a nonzero exit.
+
+A discarded prewarm request per context runs before a measured series. It keeps first-use kernel initialization out of one measured arm.
+
+## Re-derive and verify
+
+Verify the complete published bundle without modifying it:
 
 ```bash
-python3 reproduce/derive-results.py \
-  --check-envelope results/serving-envelope.json
+python3 reproduce/derive-results.py --check-all
+shasum -a 256 -c results/SHA256SUMS
 ```
 
-Derive separate new runs by passing each JSONL file explicitly:
+Individual checks are also available:
+
+```bash
+python3 reproduce/derive-results.py --check-envelope results/serving-envelope.json
+python3 reproduce/derive-results.py --check-matched
+python3 reproduce/derive-results.py --check-prefix-affinity
+python3 reproduce/derive-results.py --check-benchmark-summary
+```
+
+Derive a new legacy-format run by passing its JSONL files explicitly:
 
 ```bash
 python3 reproduce/derive-results.py \
@@ -74,78 +98,33 @@ python3 reproduce/derive-results.py \
   --input /tmp/dsv4-k5.jsonl --json
 ```
 
-Writing an envelope requires the explicit `--json-out PATH` option. The default
-command reads the 12 bundled raw files and prints a human-readable summary.
+Writing output requires an explicit output option. The verifier returns nonzero for malformed, incomplete, failed, duplicated, or control-drifted evidence.
 
-The k=5 cells each include two warm turns with first-visible-token time above
-two seconds. `serving-envelope.json` discloses their exact timings under
-`warm_stall_turns_s`. No p95 is published because the retained source
-summarizer's p95 rule does not reconcile with a linear-interpolation p95 of the
-raw warm aggregate.
+## Environment and gateway provenance
 
-## Hardware and software record
+The digest-pinned launcher encodes the standing profile and validates a local model-revision marker. The matched manifest records the image ID used in both measured arms. [`results/environment.md`](../results/environment.md) separates the campaign environments and later runtime verification.
 
-Measurement took place on one dedicated 8x B200 node on 2026-08-21. The final
-profile was DP8 attention with EP8 experts, FP8 KV cache, FP4 routed experts,
-the FP4 indexer cache, `deep_gemm_mega_moe`, DSpark k=5 greedy,
-`--max-num-batched-tokens 8192`, `--max-num-seqs 256`, and
-`--gpu-memory-utilization 0.85`.
-
-The retained deployment used the `v0.25.0` image tag. The reproducibility plan
-records these coordinates:
-
-- image digest `sha256:e1c1ff1af9a15921bfa11d1d95047258c1797392cdbfa296e7639da446b23f97`
-- vLLM build `dd10e03f95f94edbea1975c67ace3a35ec9a8a40`
-
-The digest is a recorded reproducibility anchor because the deployed launcher
-used the mutable tag; it was not independently recovered from the published
-request records.
-
-Model revision `7872f01b1d1fe23eabc4c98b48bffcef5a386062` is recorded in the
-launcher and model configuration, and `run-replicas.sh` requires a matching
-local revision marker before launch. `results/environment.md` lists the full
-record and unavailable patch-level versions.
-
-## Gateway provenance and scope
-
-The public nginx files are sanitized references derived from the retained
-gateway configuration. They contain no real keys. The ingress supplies an
-authenticated user label for fallback affinity and clears an external rank
-override. The affinity layer selects a rank, then strips rank and session
-headers before the engine.
-
-The private deployment included a separate request transformer for unsupported
-media. Its code is not published here and it is not required by the public
-reference, which accepts text-only payloads. The public repository therefore
-does not claim complete gateway parity with that deployment.
-
-Claude Code 2.1.229 is the recorded client version for the retained Anthropic
-Messages observations. The public reference does not certify later client
-versions, non-streaming Messages, beta-query behavior, or native nginx error
-envelopes as Anthropic-compatible.
+The public nginx files are sanitized references. The ingress authenticates requests and provides a trusted fallback affinity key. The balancer selects a rank, then strips rank and session headers before proxying. The private deployment included a separate media-normalization component that is not published or required for the text-only reference.
 
 ## Evidence classes
 
-- **Published**: recomputable or directly inspectable in this repository.
-- **Configuration**: implemented by a published reference file, but not proven
-  by the performance records alone.
-- **Recorded**: retained in the source run material but not included as public
-  evidence. Recorded claims are not publicly re-derivable.
+- **Published raw:** recomputable from selected request or session records in this repository.
+- **Published configuration:** directly inspectable in a launcher, nginx reference, or manifest.
+- **Published summary:** machine-readable retained values whose source request records are not included.
+- **Recorded:** described by a dated verification record while the underlying operational artifact remains private.
+- **First-party design:** an upstream issue or source that supports architecture rationale rather than this repository's measured performance.
 
-`CLAIM-LEDGER.md` assigns one of these classes to every nontrivial README claim.
+[`CLAIM-LEDGER.md`](../CLAIM-LEDGER.md) assigns a class and boundary to every material claim.
 
-## Unverified items
+## Unverified scope
 
-The repository does not claim verification of:
+This repository does not claim:
 
-- live `nginx -t` against the target installation;
-- exact 413, 429, connection-refusal, timeout, or mid-stream error bodies;
-- non-streaming and beta-query Anthropic compatibility through the complete
-  gateway;
-- a fresh boot-log read of 17,076,237 KV tokens per rank;
-- patch-level NVIDIA driver, CUDA runtime, PyTorch, or NCCL versions;
-- clean recreation of the measured result from the recorded image digest.
+- live `nginx -t` validation of the sanitized references on another installation;
+- patch-level runtime versions for the August 19 and August 21 campaign containers beyond the retained record;
+- Anthropic-compatible JSON parity for nginx-generated errors;
+- complete gateway behavior under timeout or mid-stream fault injection;
+- clean recreation of any campaign from the pinned image;
+- accuracy, model quality, saturated throughput, or arbitrary production-load performance.
 
-Model weights and upstream software retain their own licenses. This
-repository's scripts and prose are MIT licensed. It republishes no model
-weights.
+Model weights and upstream software retain their own licenses. This repository republishes no model weights.

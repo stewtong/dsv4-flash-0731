@@ -3,7 +3,7 @@
 # API server per DP rank (each on its own loopback port), behind a session-
 # affinity reverse proxy (see nginx.conf).
 #
-# This covers the two engine configurations in results/serving-envelope.json:
+# This covers the two engine configurations in results/dspark-matched:
 # SPECULATION=off and SPECULATION=k5. It is intentionally minimal and
 # secret-free. Replace the placeholders below with your own bindings and
 # credentials. The measurement assumed a dedicated 8x B200 node.
