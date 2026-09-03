@@ -104,7 +104,7 @@ Writing output requires an explicit output option. The verifier returns nonzero 
 
 The digest-pinned launcher encodes the reference deployment and validates a local model-revision marker. The matched manifest records the image ID used in both measured arms. [`results/environment.md`](../results/environment.md) separates the campaign environments and later runtime verification.
 
-The public nginx files are sanitized references. The ingress authenticates requests and provides a trusted fallback affinity key. The balancer selects a rank, then strips rank and session headers before proxying. The private deployment included a separate media-normalization component that is not published or required for the text-only reference.
+The public nginx files are sanitized references. The ingress authenticates requests and provides a trusted fallback affinity key. The balancer selects a rank, then strips rank and session headers before proxying. The private deployment included a separate media-normalization component that is not published or required for the public reference.
 
 ## Evidence classes
 

@@ -2,7 +2,7 @@
 
 # DeepSeek-V4-Flash-0731 on B200
 
-This repository publishes a text-only serving recipe for DeepSeek-V4-Flash-0731 on one dedicated 8x B200 node. The validated topology is 1-way tensor parallelism, 8-way data-parallel attention, and 8-way expert parallelism (TP1, DP8, EP8). It uses vLLM's multi-port external load-balancing mode, FP8 KV cache, an FP4 indexer cache, and DSpark speculative decoding with five draft tokens and greedy draft sampling.
+This repository publishes a serving configuration for DeepSeek-V4-Flash-0731 on one dedicated 8x B200 node. The validated topology is 1-way tensor parallelism, 8-way data-parallel attention, and 8-way expert parallelism (TP1, DP8, EP8). It uses vLLM's multi-port external load-balancing mode, FP8 KV cache, an FP4 indexer cache, and DSpark speculative decoding with five draft tokens and greedy draft sampling.
 
 The matched benchmark found that DSpark k=5 reduced pooled warm median (p50) normalized 800-token wall time by **55.1% at 128K** and **52.2% at 256K** versus speculative decoding disabled. All six session-level mean comparisons favored k=5. The result covers serial requests with session affinity. Aggregate throughput and model quality remain unmeasured.
 
