@@ -1,0 +1,8 @@
+{
+  "schema_version": "dsv4flash-engine-counters/v1",
+  "arm": "specoff",
+  "n_errors": 0,
+  "errors": [],
+  "acceptance_by_position": {},
+  "spec_decode_counter_delta": {}
+}

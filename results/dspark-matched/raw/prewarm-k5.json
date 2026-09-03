@@ -1,0 +1,66 @@
+[
+  {
+    "arm": "k5",
+    "context": "128K",
+    "shape_tok": 131072,
+    "session_index": 0,
+    "turn": 1,
+    "status": "ok",
+    "status_code": 200,
+    "error_class": null,
+    "stop_reason": "end_turn",
+    "input_tokens": 132692,
+    "output_tokens": 373,
+    "ttfvt_s": 4.08998966217041,
+    "wall_s": 5.517704010009766,
+    "decode_window_s": 1.4277143478393555,
+    "tps_turn": 67.60058156858976,
+    "tps_decode": 261.25674268419516,
+    "pinned_rank_port": 8102,
+    "pinned_hit_frac": 0.0,
+    "pinned_d_queries": 132692.0,
+    "pinned_d_hits": 0.0,
+    "rank_deltas": {
+      "8102": {
+        "d_queries": 132692.0,
+        "d_hits": 0.0,
+        "hit_frac": 0.0,
+        "kv_after": 0.0,
+        "running_after": 0.0,
+        "waiting_after": 0.0
+      }
+    }
+  },
+  {
+    "arm": "k5",
+    "context": "256K",
+    "shape_tok": 262144,
+    "session_index": 0,
+    "turn": 1,
+    "status": "ok",
+    "status_code": 200,
+    "error_class": null,
+    "stop_reason": "max_tokens",
+    "input_tokens": 264739,
+    "output_tokens": 1024,
+    "ttfvt_s": 9.041710376739502,
+    "wall_s": 13.22513461112976,
+    "decode_window_s": 4.183424234390259,
+    "tps_turn": 77.42832342426529,
+    "tps_decode": 244.77555768360887,
+    "pinned_rank_port": 8101,
+    "pinned_hit_frac": 0.0,
+    "pinned_d_queries": 264739.0,
+    "pinned_d_hits": 0.0,
+    "rank_deltas": {
+      "8101": {
+        "d_queries": 264739.0,
+        "d_hits": 0.0,
+        "hit_frac": 0.0,
+        "kv_after": 0.0,
+        "running_after": 0.0,
+        "waiting_after": 0.0
+      }
+    }
+  }
+]

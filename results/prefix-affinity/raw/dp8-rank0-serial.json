@@ -1,0 +1,83 @@
+{
+  "schema_version": "dsv4flash-prefix-affinity-records/v1",
+  "topology": "DP8+EP8",
+  "routing": "direct rank pin",
+  "serving_rank": 0,
+  "mode": "serial",
+  "nominal_shape_tokens": [
+    131072,
+    262144
+  ],
+  "turns_per_session": 6,
+  "sessions_per_shape": 3,
+  "concurrency": 1,
+  "n_errors": 0,
+  "sessions_summary": [
+    {
+      "context": "128K-class",
+      "shape_tok": 131072,
+      "session_index": 0,
+      "actual_prompt_tokens": 209687,
+      "t1_ttft_s": 6.6747963428497314,
+      "late_median_ttft_s": 0.5186131000518799,
+      "warm_delta_pct": -92.23027829744295,
+      "n_turns": 6,
+      "ok": 6
+    },
+    {
+      "context": "128K-class",
+      "shape_tok": 131072,
+      "session_index": 1,
+      "actual_prompt_tokens": 209645,
+      "t1_ttft_s": 6.595006465911865,
+      "late_median_ttft_s": 0.47389793395996094,
+      "warm_delta_pct": -92.81429159456576,
+      "n_turns": 6,
+      "ok": 6
+    },
+    {
+      "context": "128K-class",
+      "shape_tok": 131072,
+      "session_index": 2,
+      "actual_prompt_tokens": 209642,
+      "t1_ttft_s": 6.59314227104187,
+      "late_median_ttft_s": 0.4794936180114746,
+      "warm_delta_pct": -92.72738857589215,
+      "n_turns": 6,
+      "ok": 6
+    },
+    {
+      "context": "256K-class",
+      "shape_tok": 262144,
+      "session_index": 0,
+      "actual_prompt_tokens": 420427,
+      "t1_ttft_s": 28.17626667022705,
+      "late_median_ttft_s": 0.9840576648712158,
+      "warm_delta_pct": -96.50749449389959,
+      "n_turns": 6,
+      "ok": 6
+    },
+    {
+      "context": "256K-class",
+      "shape_tok": 262144,
+      "session_index": 1,
+      "actual_prompt_tokens": 420412,
+      "t1_ttft_s": 16.22426128387451,
+      "late_median_ttft_s": 0.9724903106689453,
+      "warm_delta_pct": -94.0059501406359,
+      "n_turns": 6,
+      "ok": 6
+    },
+    {
+      "context": "256K-class",
+      "shape_tok": 262144,
+      "session_index": 2,
+      "actual_prompt_tokens": 420369,
+      "t1_ttft_s": 16.29347324371338,
+      "late_median_ttft_s": 0.9949159622192383,
+      "warm_delta_pct": -93.89377607010148,
+      "n_turns": 6,
+      "ok": 6
+    }
+  ]
+}

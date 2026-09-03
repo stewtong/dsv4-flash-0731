@@ -1,0 +1,39 @@
+{
+  "schema_version": "dsv4flash-engine-counters/v1",
+  "arm": "k5",
+  "n_errors": 0,
+  "errors": [],
+  "acceptance_by_position": {
+    "0": 6065.0,
+    "1": 5162.0,
+    "2": 4283.0,
+    "3": 3541.0,
+    "4": 2829.0
+  },
+  "spec_decode_counter_delta": {
+    "vllm:spec_decode_num_accepted_tokens_per_pos_total{engine=\"0\",model_name=\"deepseek-v4-flash-0731\",position=\"0\"}": 2069.0,
+    "vllm:spec_decode_num_accepted_tokens_per_pos_total{engine=\"0\",model_name=\"deepseek-v4-flash-0731\",position=\"1\"}": 1759.0,
+    "vllm:spec_decode_num_accepted_tokens_per_pos_total{engine=\"0\",model_name=\"deepseek-v4-flash-0731\",position=\"2\"}": 1479.0,
+    "vllm:spec_decode_num_accepted_tokens_per_pos_total{engine=\"0\",model_name=\"deepseek-v4-flash-0731\",position=\"3\"}": 1233.0,
+    "vllm:spec_decode_num_accepted_tokens_per_pos_total{engine=\"0\",model_name=\"deepseek-v4-flash-0731\",position=\"4\"}": 993.0,
+    "vllm:spec_decode_num_accepted_tokens_per_pos_total{engine=\"6\",model_name=\"deepseek-v4-flash-0731\",position=\"0\"}": 1875.0,
+    "vllm:spec_decode_num_accepted_tokens_per_pos_total{engine=\"6\",model_name=\"deepseek-v4-flash-0731\",position=\"1\"}": 1583.0,
+    "vllm:spec_decode_num_accepted_tokens_per_pos_total{engine=\"6\",model_name=\"deepseek-v4-flash-0731\",position=\"2\"}": 1272.0,
+    "vllm:spec_decode_num_accepted_tokens_per_pos_total{engine=\"6\",model_name=\"deepseek-v4-flash-0731\",position=\"3\"}": 1044.0,
+    "vllm:spec_decode_num_accepted_tokens_per_pos_total{engine=\"6\",model_name=\"deepseek-v4-flash-0731\",position=\"4\"}": 822.0,
+    "vllm:spec_decode_num_accepted_tokens_per_pos_total{engine=\"7\",model_name=\"deepseek-v4-flash-0731\",position=\"0\"}": 2121.0,
+    "vllm:spec_decode_num_accepted_tokens_per_pos_total{engine=\"7\",model_name=\"deepseek-v4-flash-0731\",position=\"1\"}": 1820.0,
+    "vllm:spec_decode_num_accepted_tokens_per_pos_total{engine=\"7\",model_name=\"deepseek-v4-flash-0731\",position=\"2\"}": 1532.0,
+    "vllm:spec_decode_num_accepted_tokens_per_pos_total{engine=\"7\",model_name=\"deepseek-v4-flash-0731\",position=\"3\"}": 1264.0,
+    "vllm:spec_decode_num_accepted_tokens_per_pos_total{engine=\"7\",model_name=\"deepseek-v4-flash-0731\",position=\"4\"}": 1014.0,
+    "vllm:spec_decode_num_accepted_tokens_total{engine=\"0\",model_name=\"deepseek-v4-flash-0731\"}": 7533.0,
+    "vllm:spec_decode_num_accepted_tokens_total{engine=\"6\",model_name=\"deepseek-v4-flash-0731\"}": 6596.0,
+    "vllm:spec_decode_num_accepted_tokens_total{engine=\"7\",model_name=\"deepseek-v4-flash-0731\"}": 7751.0,
+    "vllm:spec_decode_num_draft_tokens_total{engine=\"0\",model_name=\"deepseek-v4-flash-0731\"}": 11435.0,
+    "vllm:spec_decode_num_draft_tokens_total{engine=\"6\",model_name=\"deepseek-v4-flash-0731\"}": 10500.0,
+    "vllm:spec_decode_num_draft_tokens_total{engine=\"7\",model_name=\"deepseek-v4-flash-0731\"}": 11760.0,
+    "vllm:spec_decode_num_drafts_total{engine=\"0\",model_name=\"deepseek-v4-flash-0731\"}": 2287.0,
+    "vllm:spec_decode_num_drafts_total{engine=\"6\",model_name=\"deepseek-v4-flash-0731\"}": 2100.0,
+    "vllm:spec_decode_num_drafts_total{engine=\"7\",model_name=\"deepseek-v4-flash-0731\"}": 2352.0
+  }
+}

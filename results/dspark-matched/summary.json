@@ -1,0 +1,430 @@
+{
+  "schema_version": "dsv4flash-dspark-matched/v1",
+  "method": {
+    "contexts": [
+      "128K",
+      "256K"
+    ],
+    "sessions_per_context": 3,
+    "turns_per_session": 6,
+    "cold_turn": 1,
+    "warm_turns": [
+      2,
+      3,
+      4,
+      5,
+      6
+    ],
+    "warm_observations_per_arm_and_context": 15,
+    "normalized_output_tokens": 800,
+    "normalized_wall_formula": "ttfvt_s + 800 / tps_decode",
+    "comparison_delta_formula": "100 * (k5 - specoff) / specoff",
+    "pooled_warm_values_are_descriptive": true,
+    "raw_wall_comparable_between_arms": false
+  },
+  "controls": {
+    "common": {
+      "aggregate_health_port": 9256,
+      "api": "messages",
+      "arm_mode": "serial",
+      "block_size": 256,
+      "data_parallel_external_lb": true,
+      "data_parallel_size": 8,
+      "data_parallel_size_local": 8,
+      "gpu_memory_utilization": 0.85,
+      "image": "vllm/vllm-openai:v0.25.0",
+      "image_id_sha256": "d5219758abb32a8fa60cf18fc6f8a5b2984aea0ad4004f71ae9ca835bc15c8fd",
+      "kv_cache_dtype": "fp8",
+      "max_num_batched_tokens": 8192,
+      "max_num_seqs": 256,
+      "max_tokens": 1024,
+      "model": "deepseek-v4-flash-0731",
+      "model_revision": "7872f01b1d1fe23eabc4c98b48bffcef5a386062",
+      "moe_backend": "deep_gemm_mega_moe",
+      "pin": "lb",
+      "rank_ports": [
+        8100,
+        8101,
+        8102,
+        8103,
+        8104,
+        8105,
+        8106,
+        8107
+      ],
+      "sessions": 3,
+      "temperature": 0,
+      "turns": 6,
+      "use_fp4_indexer_cache": true
+    },
+    "specoff": {
+      "speculative_config": null,
+      "kv_capacity_tokens_per_rank": 17837368
+    },
+    "k5": {
+      "speculative_config": {
+        "method": "dspark",
+        "num_speculative_tokens": 5,
+        "draft_sample_method": "greedy"
+      },
+      "kv_capacity_tokens_per_rank": 17076237
+    }
+  },
+  "arms": {
+    "specoff": {
+      "n_records": 36,
+      "n_ok": 36,
+      "n_errors": 0,
+      "contexts": {
+        "128K": {
+          "n_records": 18,
+          "n_cold_turns": 3,
+          "n_warm_turns": 15,
+          "cold_turn1_ttfvt_mean_s": 4.3387,
+          "cold_turn1_input_tokens": [
+            132622,
+            132706,
+            132623
+          ],
+          "normalized_800_wall_s": {
+            "p50": 8.7055,
+            "mean": 10.0807,
+            "range": [
+              8.2644,
+              21.0118
+            ]
+          },
+          "raw_wall_s": {
+            "p50": 11.0254,
+            "mean": 11.7644,
+            "range": [
+              1.3454,
+              23.3654
+            ]
+          },
+          "ttfvt_s": {
+            "p50": 0.416,
+            "mean": 1.8956,
+            "range": [
+              0.3761,
+              12.6058
+            ]
+          },
+          "decode_tokens_per_second": {
+            "p50": 97.16,
+            "mean": 97.79,
+            "range": [
+              94.64,
+              101.81
+            ]
+          },
+          "output_tokens": {
+            "mean": 962.1,
+            "range": [
+              96,
+              1024
+            ]
+          },
+          "warm_stalls_ttfvt_over_3s": 2,
+          "session_normalized_800_wall": [
+            {
+              "session_index": 0,
+              "n_warm_turns": 5,
+              "normalized_800_wall_mean_s": 11.2487
+            },
+            {
+              "session_index": 1,
+              "n_warm_turns": 5,
+              "normalized_800_wall_mean_s": 10.3353
+            },
+            {
+              "session_index": 2,
+              "n_warm_turns": 5,
+              "normalized_800_wall_mean_s": 8.6579
+            }
+          ]
+        },
+        "256K": {
+          "n_records": 18,
+          "n_cold_turns": 3,
+          "n_warm_turns": 15,
+          "cold_turn1_ttfvt_mean_s": 9.0008,
+          "cold_turn1_input_tokens": [
+            264609,
+            264696,
+            264680
+          ],
+          "normalized_800_wall_s": {
+            "p50": 8.5306,
+            "mean": 8.5433,
+            "range": [
+              7.9458,
+              8.9593
+            ]
+          },
+          "raw_wall_s": {
+            "p50": 2.8562,
+            "mean": 6.3321,
+            "range": [
+              1.5822,
+              11.2771
+            ]
+          },
+          "ttfvt_s": {
+            "p50": 0.6485,
+            "mean": 0.6507,
+            "range": [
+              0.5994,
+              0.7178
+            ]
+          },
+          "decode_tokens_per_second": {
+            "p50": 100.87,
+            "mean": 101.55,
+            "range": [
+              96.64,
+              109.69
+            ]
+          },
+          "output_tokens": {
+            "mean": 560.7,
+            "range": [
+              102,
+              1024
+            ]
+          },
+          "warm_stalls_ttfvt_over_3s": 0,
+          "session_normalized_800_wall": [
+            {
+              "session_index": 0,
+              "n_warm_turns": 5,
+              "normalized_800_wall_mean_s": 8.3756
+            },
+            {
+              "session_index": 1,
+              "n_warm_turns": 5,
+              "normalized_800_wall_mean_s": 8.4649
+            },
+            {
+              "session_index": 2,
+              "n_warm_turns": 5,
+              "normalized_800_wall_mean_s": 8.7893
+            }
+          ]
+        }
+      }
+    },
+    "k5": {
+      "n_records": 36,
+      "n_ok": 36,
+      "n_errors": 0,
+      "contexts": {
+        "128K": {
+          "n_records": 18,
+          "n_cold_turns": 3,
+          "n_warm_turns": 15,
+          "cold_turn1_ttfvt_mean_s": 4.0729,
+          "cold_turn1_input_tokens": [
+            132622,
+            132706,
+            132623
+          ],
+          "normalized_800_wall_s": {
+            "p50": 3.9072,
+            "mean": 3.7788,
+            "range": [
+              2.6506,
+              4.3732
+            ]
+          },
+          "raw_wall_s": {
+            "p50": 4.4407,
+            "mean": 3.616,
+            "range": [
+              0.6812,
+              5.1269
+            ]
+          },
+          "ttfvt_s": {
+            "p50": 0.41,
+            "mean": 0.4169,
+            "range": [
+              0.3658,
+              0.51
+            ]
+          },
+          "decode_tokens_per_second": {
+            "p50": 227.93,
+            "mean": 243.46,
+            "range": [
+              205.79,
+              373.72
+            ]
+          },
+          "output_tokens": {
+            "mean": 754.4,
+            "range": [
+              64,
+              1024
+            ]
+          },
+          "warm_stalls_ttfvt_over_3s": 0,
+          "session_normalized_800_wall": [
+            {
+              "session_index": 0,
+              "n_warm_turns": 5,
+              "normalized_800_wall_mean_s": 3.9427
+            },
+            {
+              "session_index": 1,
+              "n_warm_turns": 5,
+              "normalized_800_wall_mean_s": 3.6797
+            },
+            {
+              "session_index": 2,
+              "n_warm_turns": 5,
+              "normalized_800_wall_mean_s": 3.7139
+            }
+          ]
+        },
+        "256K": {
+          "n_records": 18,
+          "n_cold_turns": 3,
+          "n_warm_turns": 15,
+          "cold_turn1_ttfvt_mean_s": 9.0541,
+          "cold_turn1_input_tokens": [
+            264609,
+            264696,
+            264680
+          ],
+          "normalized_800_wall_s": {
+            "p50": 4.0742,
+            "mean": 4.0045,
+            "range": [
+              3.2051,
+              4.5032
+            ]
+          },
+          "raw_wall_s": {
+            "p50": 4.8507,
+            "mean": 4.238,
+            "range": [
+              1.3041,
+              5.4736
+            ]
+          },
+          "ttfvt_s": {
+            "p50": 0.6827,
+            "mean": 0.6873,
+            "range": [
+              0.652,
+              0.7663
+            ]
+          },
+          "decode_tokens_per_second": {
+            "p50": 236.43,
+            "mean": 244.75,
+            "range": [
+              207.73,
+              323.51
+            ]
+          },
+          "output_tokens": {
+            "mean": 860.6,
+            "range": [
+              177,
+              1024
+            ]
+          },
+          "warm_stalls_ttfvt_over_3s": 0,
+          "session_normalized_800_wall": [
+            {
+              "session_index": 0,
+              "n_warm_turns": 5,
+              "normalized_800_wall_mean_s": 4.2549
+            },
+            {
+              "session_index": 1,
+              "n_warm_turns": 5,
+              "normalized_800_wall_mean_s": 3.9542
+            },
+            {
+              "session_index": 2,
+              "n_warm_turns": 5,
+              "normalized_800_wall_mean_s": 3.8044
+            }
+          ]
+        }
+      }
+    }
+  },
+  "comparison": {
+    "128K": {
+      "normalized_800_wall_p50_delta_pct": -55.12,
+      "normalized_800_wall_mean_delta_pct": -62.51,
+      "decode_rate_p50_delta_pct": 134.59,
+      "ttfvt_p50_delta_pct": -1.45,
+      "session_normalized_800_wall_mean_deltas_pct": [
+        {
+          "session_index": 0,
+          "delta_pct": -64.95
+        },
+        {
+          "session_index": 1,
+          "delta_pct": -64.4
+        },
+        {
+          "session_index": 2,
+          "delta_pct": -57.1
+        }
+      ]
+    },
+    "256K": {
+      "normalized_800_wall_p50_delta_pct": -52.24,
+      "normalized_800_wall_mean_delta_pct": -53.13,
+      "decode_rate_p50_delta_pct": 134.4,
+      "ttfvt_p50_delta_pct": 5.28,
+      "session_normalized_800_wall_mean_deltas_pct": [
+        {
+          "session_index": 0,
+          "delta_pct": -49.2
+        },
+        {
+          "session_index": 1,
+          "delta_pct": -53.29
+        },
+        {
+          "session_index": 2,
+          "delta_pct": -56.72
+        }
+      ]
+    }
+  },
+  "stalls": [
+    {
+      "arm": "specoff",
+      "context": "128K",
+      "session_index": 0,
+      "turn": 2,
+      "ttfvt_s": 12.6058
+    },
+    {
+      "arm": "specoff",
+      "context": "128K",
+      "session_index": 1,
+      "turn": 2,
+      "ttfvt_s": 10.1781
+    }
+  ],
+  "k5_acceptance_by_position_tokens": {
+    "0": 6065,
+    "1": 5162,
+    "2": 4283,
+    "3": 3541,
+    "4": 2829
+  },
+  "speculation_counters": {
+    "specoff_moved": false,
+    "k5_moved": true
+  }
+}

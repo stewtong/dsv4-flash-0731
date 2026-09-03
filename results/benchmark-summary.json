@@ -1,0 +1,97 @@
+{
+  "schema_version": "dsv4flash-benchmark-summary/v1",
+  "campaigns": {
+    "cold_topology": {
+      "evidence_class": "summary-only",
+      "source_url": "https://github.com/vllm-project/vllm/issues/51454",
+      "engine": "vLLM 0.25.0",
+      "hardware": "8x NVIDIA B200 SXM",
+      "speculative_decoding": false,
+      "max_num_batched_tokens": 8192,
+      "max_tokens": 64,
+      "repetitions_per_cell": 3,
+      "requests_per_topology": 276,
+      "arrival_model": "closed loop",
+      "prompt_source": "cache-busted public-domain Federalist prose",
+      "topologies": {
+        "TP8": {"tensor_parallel_size": 8, "data_parallel_size": 1, "expert_parallel_size": 8, "kv_tokens_per_replica": 21419891},
+        "TP4xDP2": {"tensor_parallel_size": 4, "data_parallel_size": 2, "expert_parallel_size": 8, "kv_tokens_per_replica_range": [21259748, 21260045]},
+        "TP2xDP4": {"tensor_parallel_size": 2, "data_parallel_size": 4, "expert_parallel_size": 8, "kv_tokens_per_replica": 20971965},
+        "DP8": {"tensor_parallel_size": 1, "data_parallel_size": 8, "expert_parallel_size": 8, "kv_tokens_per_replica": 20571235}
+      },
+      "cells": [
+        {"context": "32K", "concurrency": 4, "ttft_s": {"TP8": [2.54, 3.30], "TP4xDP2": [2.98, 3.97], "TP2xDP4": [2.24, 3.16], "DP8": [1.32, 1.90]}},
+        {"context": "32K", "concurrency": 8, "ttft_s": {"TP8": [4.16, 6.50], "TP4xDP2": [2.60, 3.82], "TP2xDP4": [2.04, 3.18], "DP8": [1.53, 2.40]}},
+        {"context": "32K", "concurrency": 16, "ttft_s": {"TP8": [7.41, 12.92], "TP4xDP2": [4.25, 18.16], "TP2xDP4": [3.01, 5.64], "DP8": [2.23, 3.73]}},
+        {"context": "128K", "concurrency": 4, "ttft_s": {"TP8": [11.29, 14.71], "TP4xDP2": [8.64, 12.77], "TP2xDP4": [5.57, 9.02], "DP8": [5.31, 8.38]}},
+        {"context": "128K", "concurrency": 8, "ttft_s": {"TP8": [18.45, 29.15], "TP4xDP2": [11.60, 15.36], "TP2xDP4": [9.15, 22.44], "DP8": [6.29, 9.98]}},
+        {"context": "128K", "concurrency": 16, "ttft_s": {"TP8": [32.81, 58.04], "TP4xDP2": [18.97, 30.22], "TP2xDP4": [12.31, 17.94], "DP8": [9.21, 28.50]}},
+        {"context": "256K", "concurrency": 4, "ttft_s": {"TP8": [25.48, 33.56], "TP4xDP2": [17.56, 17.87], "TP2xDP4": [10.21, 10.77], "DP8": [12.12, 20.98]}},
+        {"context": "256K", "concurrency": 8, "ttft_s": {"TP8": [41.71, 66.54], "TP4xDP2": [26.25, 34.82], "TP2xDP4": [18.66, 30.31], "DP8": [13.24, 22.08]}},
+        {"context": "256K", "concurrency": 16, "ttft_s": {"TP8": [74.83, 132.39], "TP4xDP2": [42.93, 68.89], "TP2xDP4": [27.99, 39.42], "DP8": [21.31, 33.51]}},
+        {"context": "512K", "concurrency": 4, "ttft_s": {"TP8": [65.30, 86.56], "TP4xDP2": [45.09, 45.40], "TP2xDP4": [25.73, 51.31], "DP8": [27.88, 48.23]}},
+        {"context": "1M", "concurrency": 4, "ttft_s": {"TP8": [189.08, 250.96], "TP4xDP2": [128.99, 130.08], "TP2xDP4": [75.89, 143.78], "DP8": [72.00, 134.87]}}
+      ],
+      "ttft_value_order": ["p50", "p95"],
+      "request_failures": 0,
+      "generation_anomaly": "One HTTP 200 response with one completion token and empty content appeared independently in the 512K concurrency-4 cell on TP8 and DP8."
+    },
+    "batched_token_budget": {
+      "evidence_class": "summary-only",
+      "source_url": "https://github.com/vllm-project/vllm/issues/51454",
+      "topology": "TP2xDP4 with EP8",
+      "metric": "TTFT p95 seconds",
+      "controls": "Matched except max_num_batched_tokens",
+      "kv_tokens_per_replica": {"8192": 20971965, "16384": 14138549},
+      "cells": [
+        {"context": "32K", "concurrency": 4, "8192": 3.16, "16384": 2.35},
+        {"context": "32K", "concurrency": 8, "8192": 3.18, "16384": 3.19},
+        {"context": "32K", "concurrency": 16, "8192": 5.64, "16384": 5.07},
+        {"context": "128K", "concurrency": 4, "8192": 9.02, "16384": 5.93},
+        {"context": "128K", "concurrency": 8, "8192": 22.44, "16384": 13.85},
+        {"context": "128K", "concurrency": 16, "8192": 17.94, "16384": 22.04},
+        {"context": "256K", "concurrency": 4, "8192": 10.77, "16384": 12.54},
+        {"context": "256K", "concurrency": 8, "8192": 30.31, "16384": 29.70},
+        {"context": "256K", "concurrency": 16, "8192": 39.42, "16384": 41.96},
+        {"context": "512K", "concurrency": 4, "8192": 51.31, "16384": 50.03},
+        {"context": "1M", "concurrency": 4, "8192": 143.78, "16384": 136.02}
+      ],
+      "decision": "Keep 8192 because the latency direction was inconsistent and 16384 reduced KV capacity by 32.6%."
+    },
+    "dspark_widths": {
+      "evidence_class": "retained-summary",
+      "source_boundary": "The selected matched off-versus-k5 records are published under results/dspark-matched. The earlier width sweep is summarized from the retained August 21 campaign.",
+      "workload": "Three six-turn serial sessions at 128K and 256K, temperature 0, max_tokens 1024, fixed prewarm",
+      "rows": [
+        {"width": 3, "max_num_batched_tokens": 8192, "effective_scheduled_tokens": 7680, "kv_tokens_per_rank": 17076237, "decode_tokens_per_second": {"128K": 179.1, "256K": 193.7}, "mean_accepted_tokens_per_step": 2.316, "acceptance_rate_pct": 77.2},
+        {"width": 4, "max_num_batched_tokens": 8960, "effective_scheduled_tokens": 8192, "kv_tokens_per_rank": 16353196, "decode_tokens_per_second": {"128K": 202.5, "256K": 212.8}, "mean_accepted_tokens_per_step": 2.797, "acceptance_rate_pct": 69.9},
+        {"width": 5, "max_num_batched_tokens": 9216, "effective_scheduled_tokens": 8192, "kv_tokens_per_rank": 16138640, "decode_tokens_per_second": {"128K": 223.1, "256K": 237.5}, "mean_accepted_tokens_per_step": 3.065, "acceptance_rate_pct": 61.3},
+        {"width": 7, "max_num_batched_tokens": 9728, "effective_scheduled_tokens": 8192, "kv_tokens_per_rank": 15677138, "decode_tokens_per_second": {"128K": 260.5, "256K": 259.0}, "mean_accepted_tokens_per_step": null, "acceptance_rate_pct": null}
+      ],
+      "selected_profile": {"width": 5, "max_num_batched_tokens": 8192, "effective_scheduled_tokens": 7168, "kv_tokens_per_rank": 17076237},
+      "selection_reason": "Width 7 improved normalized 800-token wall by 13.0% at 128K but only 6.4% at 256K and worsened the 256K concurrent warm-prefill regression. Returning k5 to an 8192 budget changed the measured serial cells by less than 5% and recovered 5.8% KV capacity.",
+      "mtp_result": "The checkpoint-specific MTP launch failed while loading a missing mtp_block.main_norm.weight and never reached readiness."
+    },
+    "tp4_challenger": {
+      "evidence_class": "retained-summary",
+      "source_boundary": "Retained August 29 fixed-output and sticky-router campaign.",
+      "controls": "vLLM 0.25.0, DSpark k5, GPU memory utilization 0.85, max_num_batched_tokens 8192, max_num_seqs 256, fixed 512-token output",
+      "control": "DP8+EP8 with eight schedulers and cache domains",
+      "challenger": "Two independent TP4+EP4 replicas with consistent-hash routing",
+      "kv_tokens_per_node": {"DP8": 136609896, "TP4x2": 30707280},
+      "fixed_output": [
+        {"context": "1M", "metric": "TTFT seconds", "DP8": 65.31, "TP4x2": 68.10, "delta_pct": 4.3},
+        {"context": "1M", "metric": "wall seconds", "DP8": 67.05, "TP4x2": 69.58, "delta_pct": 3.8},
+        {"context": "1M", "metric": "decode TPOT milliseconds", "DP8": 3.41, "TP4x2": 2.89, "delta_pct": -15.3},
+        {"context": "68K", "metric": "wall seconds", "DP8": 4.01, "TP4x2": 3.89, "delta_pct": -3.0},
+        {"context": "68K", "metric": "decode TPOT milliseconds", "DP8": 4.21, "TP4x2": 2.88, "delta_pct": -31.6},
+        {"context": "8K", "metric": "wall seconds", "DP8": 5.14, "TP4x2": 7.36, "delta_pct": 43.3},
+        {"context": "8K", "metric": "decode TPOT milliseconds", "DP8": 9.25, "TP4x2": 4.56, "delta_pct": -50.7}
+      ],
+      "sticky_router": {"contexts": ["256K", "512K", "1.03M"], "slow_warm_wall_s_range": [16.74, 24.49]},
+      "forced_collision": "Four 1.03M sessions on one replica remained capacity-queued at the ten-minute stop; only one session completed all three turns.",
+      "not_run": "The planned 12-session mixed arm was skipped after the forced-collision gate failed.",
+      "decision": "Retain DP8 because faster decode did not improve 1M end-to-end latency and two schedulers produced material sticky-session queueing."
+    }
+  }
+}
